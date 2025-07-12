@@ -1,0 +1,122 @@
+<!-- WELCOME TO DEV BRANCH: WEBSITE CODE BELOW -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TKHUB - Stream Anything</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #141414;
+      color: white;
+    }
+    .login-container, .app-container {
+      padding: 2rem;
+      text-align: center;
+    }
+    .login-container input {
+      padding: 10px;
+      margin-top: 10px;
+      width: 250px;
+      border-radius: 4px;
+      border: 1px solid #444;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      cursor: pointer;
+      background-color: #e50914;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #000;
+      padding: 10px 20px;
+    }
+    .video-card {
+      background: #222;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 8px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .video-card img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 6px;
+    }
+    .stream-output iframe {
+      max-width: 100%;
+    }
+    .meta {
+      font-size: 0.9em;
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container" id="loginView">
+    <h2>Welcome to TKHUB</h2>
+    <input type="email" id="emailInput" placeholder="Enter your email" />
+    <button onclick="login()">Login</button>
+    <p class="hint">Use: ADMINS@TKHUB.COM, TOHIDPLAYS@GMAIL.COM, or GUEST@TKHUB.COM</p>
+  </div>
+
+  <div class="app-container" id="appView" style="display:none;">
+    <header>
+      <h1>TKHUB</h1>
+      <span id="userInfo"></span>
+    </header>
+
+    <div class="video-card">
+      <h2>The Last Guest</h2>
+      <p><span class="meta">Rated: PG | Genre: Animation, Action, Adventure, Drama, Family, Sci-Fi, War</span></p>
+      <img src="https://m.media-amazon.com/images/M/MV5BZjczYTIyZTYtYjA4NS00NzNiLTk4NzUtNGE1NzljNGI3Y2RlXkEyXkFqcGdeQXVyMjY1ODUzNzY@._V1_.jpg" alt="The Last Guest Poster">
+      <p>
+        The Last Guest in Roblox tries to survive in a harsh world, where the Roblox army pits its forces against an army of corrupt and dangerous Bacon-haired soldiers,
+        driven to cleanse the world of noobs and guests and establish a new world order.
+      </p>
+      <div class="stream-output" id="streamOutput">
+        <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/1ZM6ztUlLWY?si=198gNYrdtAY34Zd6&amp;controls=0"
+          title="YouTube video player" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const users = [
+      { username: "admin", email: "ADMINS@TKHUB.COM", google: false },
+      { username: "tohidplays", email: "TOHIDPLAYS@GMAIL.COM", google: true },
+      { username: "guest", email: "GUEST@TKHUB.COM", google: false }
+    ];
+
+    let currentUser = null;
+
+    function login() {
+      const emailInput = document.getElementById("emailInput").value.trim().toUpperCase();
+      const user = users.find(u => u.email.toUpperCase() === emailInput);
+
+      if (user) {
+        currentUser = user;
+        document.getElementById("loginView").style.display = "none";
+        document.getElementById("appView").style.display = "block";
+        document.getElementById("userInfo").textContent = `👤 ${user.username} (${user.google ? "Google" : "Local"})`;
+      } else {
+        alert("Login failed. Try ADMINS@TKHUB.COM, TOHIDPLAYS@GMAIL.COM, or GUEST@TKHUB.COM.");
+      }
+    }
+  </script>
+</body>
+</html>
