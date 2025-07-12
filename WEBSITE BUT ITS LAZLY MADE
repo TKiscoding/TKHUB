@@ -1,0 +1,177 @@
+## this is just a area for me to make a lazy not working part of tkhub ##
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TKHUB - Stream Anything</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #141414;
+      color: white;
+    }
+    .login-container, .app-container {
+      padding: 2rem;
+      text-align: center;
+    }
+    .login-container input {
+      padding: 10px;
+      margin-top: 10px;
+      width: 250px;
+      border-radius: 4px;
+      border: 1px solid #444;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      cursor: pointer;
+      background-color: #e50914;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #000;
+      padding: 10px 20px;
+    }
+    .category {
+      margin: 30px 0;
+    }
+    .video-list {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 10px;
+    }
+    .video {
+      background: #222;
+      padding: 10px;
+      min-width: 200px;
+      border-radius: 5px;
+    }
+    .hint {
+      font-size: 0.9em;
+      color: gray;
+    }
+    .stream-output {
+      margin-top: 30px;
+      padding: 20px;
+      background: #1e1e1e;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container" id="loginView">
+    <h2>Welcome to TKHUB</h2>
+    <input type="email" id="emailInput" placeholder="Enter your email" />
+    <button onclick="login()">Login</button>
+    <p class="hint">Try: ADMINS@TKHUB.COM, TOHIDPLAYS@GMAIL.COM, or GUEST@TKHUB.COM</p>
+  </div>
+
+  <div class="app-container" id="appView" style="display:none;">
+    <header>
+      <h1>TKHUB</h1>
+      <span id="userInfo"></span>
+      <button onclick="streamRandomVideo()">🎲 Random Stream</button>
+    </header>
+
+    <div id="videoCategories"></div>
+    <div class="stream-output" id="streamOutput"></div>
+  </div>
+
+  <script>
+    const users = [
+      { username: "admin", email: "ADMINS@TKHUB.COM", google: false },
+      { username: "tohidplays", email: "TOHIDPLAYS@GMAIL.COM", google: true },
+      { username: "guest", email: "GUEST@TKHUB.COM", google: false }
+    ];
+
+    const categories = [
+      {
+        name: "Trending Now",
+        videos: [
+          { title: "The Infinite Journey", description: "Sci-Fi adventure", duration: "2h 14m", year: 2023 },
+          { title: "Silent Echo", description: "Drama thriller", duration: "1h 47m", year: 2022 }
+        ]
+      },
+      {
+        name: "Comedy",
+        videos: [
+          { title: "Laugh Track", description: "Sitcom chaos", duration: "1h 25m", year: 2021 }
+        ]
+      },
+      {
+        name: "Action & Adventure",
+        videos: [
+          { title: "Edge of Tomorrowland", description: "Time travel battles", duration: "2h 5m", year: 2023 }
+        ]
+      }
+    ];
+
+    let currentUser = null;
+
+    function login() {
+      const emailInput = document.getElementById("emailInput").value.trim().toUpperCase();
+      const user = users.find(u => u.email.toUpperCase() === emailInput);
+
+      if (user) {
+        currentUser = user;
+        document.getElementById("loginView").style.display = "none";
+        document.getElementById("appView").style.display = "block";
+        document.getElementById("userInfo").textContent = `👤 ${user.username} (${user.google ? "Google" : "Local"})`;
+        renderCategories();
+      } else {
+        alert("Login failed. Please try one of the registered emails.");
+      }
+    }
+
+    function renderCategories() {
+      const container = document.getElementById("videoCategories");
+      container.innerHTML = "";
+
+      categories.forEach(category => {
+        const catDiv = document.createElement("div");
+        catDiv.className = "category";
+
+        const title = document.createElement("h2");
+        title.textContent = category.name;
+
+        const videoList = document.createElement("div");
+        videoList.className = "video-list";
+
+        category.videos.forEach(video => {
+          const vDiv = document.createElement("div");
+          vDiv.className = "video";
+          vDiv.innerHTML = `
+            <strong>${video.title}</strong><br/>
+            <small>${video.description}</small><br/>
+            <small>${video.duration}, ${video.year}</small>
+          `;
+          videoList.appendChild(vDiv);
+        });
+
+        catDiv.appendChild(title);
+        catDiv.appendChild(videoList);
+        container.appendChild(catDiv);
+      });
+    }
+
+    function streamRandomVideo() {
+      const allVideos = categories.flatMap(c => c.videos);
+      const random = allVideos[Math.floor(Math.random() * allVideos.length)];
+      document.getElementById("streamOutput").innerHTML = `
+        <h3>🎲 Now Streaming: ${random.title}</h3>
+        <p>${random.description}</p>
+        <p>Duration: ${random.duration}, Year: ${random.year}</p>
+      `;
+    }
+  </script>
+</body>
+</html>
