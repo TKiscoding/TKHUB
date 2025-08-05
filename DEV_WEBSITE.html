@@ -1,4 +1,5 @@
 <!-- WELCOME TO DEV BRANCH: WEBSITE CODE BELOW -->
+<!-- ADDED LOGIN PANEL -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +69,7 @@
     <h2>Welcome to TKHUB</h2>
     <input type="email" id="emailInput" placeholder="Enter your email" />
     <button onclick="login()">Login</button>
-    <p class="hint">Use: ADMINS@TKHUB.COM, TOHIDPLAYS@GMAIL.COM, or GUEST@TKHUB.COM</p>
+    <p class="hint">Enter any valid email to continue.</p>
   </div>
 
   <div class="app-container" id="appView" style="display:none;">
@@ -96,26 +97,19 @@
   </div>
 
   <script>
-    const users = [
-      { username: "admin", email: "ADMINS@TKHUB.COM", google: false },
-      { username: "tohidplays", email: "TOHIDPLAYS@GMAIL.COM", google: true },
-      { username: "guest", email: "GUEST@TKHUB.COM", google: false }
-    ];
-
-    let currentUser = null;
-
     function login() {
-      const emailInput = document.getElementById("emailInput").value.trim().toUpperCase();
-      const user = users.find(u => u.email.toUpperCase() === emailInput);
+      const emailInput = document.getElementById("emailInput").value.trim();
 
-      if (user) {
-        currentUser = user;
-        document.getElementById("loginView").style.display = "none";
-        document.getElementById("appView").style.display = "block";
-        document.getElementById("userInfo").textContent = `👤 ${user.username} (${user.google ? "Google" : "Local"})`;
-      } else {
-        alert("Login failed. Try ADMINS@TKHUB.COM, TOHIDPLAYS@GMAIL.COM, or GUEST@TKHUB.COM.");
+      if (emailInput === "" || !emailInput.includes("@")) {
+        alert("Please enter a valid email.");
+        return;
       }
+
+      const username = emailInput.split("@")[0]; // Use prefix before @ as username
+
+      document.getElementById("loginView").style.display = "none";
+      document.getElementById("appView").style.display = "block";
+      document.getElementById("userInfo").textContent = `👤 ${username}`;
     }
   </script>
 </body>
