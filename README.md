@@ -6,7 +6,7 @@ pretty lonely
 STATUS: 2.5% DONE
 
 
-# TRY NOW AT https://tohidplays.wixsite.com/tkhub ### 
+# TRY NOW AT [https://tohidplays.wixsite.com/tkhub](THIS LINK!) ### 
 THIS COMMIT IS THE MAIN CODE, NOTHING IN BETA AND FULLY WORKING, HOWEVER "VIDEOS" HAVEN'T BEEN IMPLEMENTED
 
 
