@@ -1,4 +1,4 @@
-<!-- TKHUB with Auth0 Login Integration -->
+<!-- TKHUB with Google Login + Email Verification + Cookies -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,16 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TKHUB - Stream Anything</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <!-- Login View -->
-  <div class="login-container" id="loginView" style="display: none;">
+  <div class="login-container" id="loginView">
     <h2>Welcome to TKHUB</h2>
-    <button onclick="login()">Login with Auth0</button>
+    <div id="g_id_onload"
+         data-client_id="777130092676-dbtq911vnl7j8c08511ru29qa6jvqelj.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false"
+         data-ux_mode="popup">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+    <p id="loginError" style="color: red; margin-top: 1rem;"></p>
   </div>
 
   <!-- App View -->
-  <div class="app-container" id="appView" style="display:none;">
+  <div class="app-container" id="appView" style="display: none;">
     <header>
       <h1>TKHUB</h1>
       <span id="userInfo"></span>
@@ -45,62 +53,83 @@
     </div>
   </div>
 
-  <!-- Load Auth0 JS SDK -->
-  <script src="https://cdn.auth0.com/js/auth0-spa-js/1.19/auth0-spa-js.production.js"></script>
   <script>
-    const AUTH0_DOMAIN = 'dev-cm5i0h251to24f6h.au.auth0.com';
-    const AUTH0_CLIENT_ID = 'z72BjjhYgRTlojMMMO8HTEjk3lPDha46';
+    // Cookie helpers
+    function setCookie(name, value, days) {
+      const expires = new Date(Date.now() + days * 864e5).toUTCString();
+      document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
+    }
 
-    let auth0Client = null;
+    function getCookie(name) {
+      return document.cookie.split('; ').reduce((r, v) => {
+        const parts = v.split('=');
+        return parts[0] === name ? decodeURIComponent(parts[1]) : r
+      }, null);
+    }
 
-    async function configureAuth0() {
-      auth0Client = await createAuth0Client({
-        domain: AUTH0_DOMAIN,
-        client_id: AUTH0_CLIENT_ID,
-        cacheLocation: 'localstorage',
-        useRefreshTokens: true
-      });
+    function eraseCookie(name) {
+      document.cookie = name + '=; Max-Age=0; path=/';
+    }
 
-      // Handle Auth0 login redirect
-      if (window.location.search.includes('code=') && window.location.search.includes('state=')) {
-        await auth0Client.handleRedirectCallback();
-        window.history.replaceState({}, document.title, '/');
+    // JWT Parser
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        console.error('Invalid JWT:', e);
+        return null;
+      }
+    }
+
+    // Google login callback
+    function handleCredentialResponse(response) {
+      const data = parseJwt(response.credential);
+
+      if (!data.email_verified) {
+        document.getElementById("loginError").textContent = "Only verified Google accounts are allowed.";
+        return;
       }
 
-      const isAuthenticated = await auth0Client.isAuthenticated();
-
-      if (isAuthenticated) {
-        const user = await auth0Client.getUser();
-        showApp(user.email, user.nickname || user.name, user.picture);
-      } else {
-        document.getElementById("loginView").style.display = "block";
-      }
+      setCookie('email', data.email, 7);
+      setCookie('name', data.name, 7);
+      setCookie('picture', data.picture, 7);
+      showApp(data.email, data.name, data.picture);
     }
 
-    async function login() {
-      await auth0Client.loginWithRedirect({
-        redirect_uri: window.location.origin
-      });
-    }
-
-    async function logout() {
-      await auth0Client.logout({
-        returnTo: window.location.origin
-      });
-    }
-
-    function showApp(email, username, avatarUrl) {
+    function showApp(email, name, picture) {
       document.getElementById("loginView").style.display = "none";
       document.getElementById("appView").style.display = "block";
 
       document.getElementById("userInfo").innerHTML = `
-        <img src="${avatarUrl}" alt="User Avatar" />
-        <span>${username}</span>
+        <img src="${picture}" alt="User Avatar" />
+        <span>${name}</span>
       `;
       document.getElementById("settingsEmail").textContent = email;
     }
 
-    window.onload = configureAuth0;
+    function logout() {
+      eraseCookie('email');
+      eraseCookie('name');
+      eraseCookie('picture');
+      location.reload();
+    }
+
+    // Auto-login if cookie exists
+    window.onload = () => {
+      const email = getCookie('email');
+      const name = getCookie('name');
+      const picture = getCookie('picture');
+
+      if (email && name && picture) {
+        showApp(email, name, picture);
+      }
+    };
   </script>
 </body>
 </html>
